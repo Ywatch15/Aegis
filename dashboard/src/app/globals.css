@@ -1,0 +1,206 @@
+@import "tailwindcss";
+
+/* ============================================================
+   AegisAPI — Cybersecurity Design System
+   Tailwind v4 CSS-based theme configuration
+   Inspired by CrowdStrike / SentinelOne SOC interfaces
+   ============================================================ */
+
+@theme inline {
+  /* ── Core Surfaces ──────────────────────────────────────── */
+  --color-aegis-bg: #06080d;
+  --color-aegis-surface: #0c1017;
+  --color-aegis-panel: #111827;
+  --color-aegis-elevated: #1a1f2e;
+  --color-aegis-border: #1e293b;
+  --color-aegis-border-light: #334155;
+  --color-aegis-glow: #3b82f6;
+
+  /* ── Threat Severity ────────────────────────────────────── */
+  --color-threat-critical: #dc2626;
+  --color-threat-high: #ef4444;
+  --color-threat-medium: #f59e0b;
+  --color-threat-low: #22c55e;
+  --color-threat-pending: #6366f1;
+  --color-threat-error: #9333ea;
+
+  /* ── Cyber Accents ──────────────────────────────────────── */
+  --color-cyber-green: #00ff88;
+  --color-cyber-blue: #00d4ff;
+  --color-cyber-purple: #a855f7;
+  --color-cyber-teal: #2dd4bf;
+
+  /* ── Text ───────────────────────────────────────────────── */
+  --color-text-primary: #f1f5f9;
+  --color-text-secondary: #94a3b8;
+  --color-text-muted: #64748b;
+  --color-text-dim: #475569;
+
+  /* ── Typography ─────────────────────────────────────────── */
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
+
+  /* ── Animations ─────────────────────────────────────────── */
+  --animate-pulse-glow: pulse-glow 2s ease-in-out infinite;
+  --animate-slide-in: slide-in-top 0.3s ease-out;
+  --animate-fade-up: fade-up 0.4s ease-out;
+  --animate-scan-line: scan-line 3s ease-in-out infinite;
+  --animate-status-pulse: status-pulse 2s ease-in-out infinite;
+}
+
+/* ── Keyframes ──────────────────────────────────────────────── */
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(239, 68, 68, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.6), 0 0 40px rgba(239, 68, 68, 0.2); }
+}
+
+@keyframes slide-in-top {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scan-line {
+  0% { background-position: 0% 0%; }
+  50% { background-position: 0% 100%; }
+  100% { background-position: 0% 0%; }
+}
+
+@keyframes status-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+@keyframes counter-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Base Layer ─────────────────────────────────────────────── */
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--color-aegis-bg);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Hex Grid Background Pattern ────────────────────────────── */
+.bg-hex-grid {
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(59, 130, 246, 0.06) 1px, transparent 0);
+  background-size: 24px 24px;
+}
+
+/* ── Scrollbar Styling ──────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-aegis-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-aegis-border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-aegis-border-light);
+}
+
+/* ── Severity Badge Glow Effects ────────────────────────────── */
+.severity-high {
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.4), inset 0 0 8px rgba(239, 68, 68, 0.1);
+}
+
+.severity-medium {
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.3), inset 0 0 8px rgba(245, 158, 11, 0.1);
+}
+
+.severity-low {
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.3), inset 0 0 8px rgba(34, 197, 94, 0.1);
+}
+
+.severity-pending {
+  animation: status-pulse 2s ease-in-out infinite;
+}
+
+.severity-error {
+  box-shadow: 0 0 8px rgba(147, 51, 234, 0.4), inset 0 0 8px rgba(147, 51, 234, 0.1);
+}
+
+/* ── Card Hover Glow ────────────────────────────────────────── */
+.card-hover {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-hover:hover {
+  border-color: var(--color-aegis-border-light);
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.05), 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* ── Log Row Animation ──────────────────────────────────────── */
+.log-row-new {
+  animation: slide-in-top 0.3s ease-out;
+}
+
+/* ── Status Dot ─────────────────────────────────────────────── */
+.status-dot-online {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--color-cyber-green);
+  box-shadow: 0 0 8px rgba(0, 255, 136, 0.6);
+  animation: status-pulse 2s ease-in-out infinite;
+}
+
+.status-dot-offline {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--color-threat-high);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+}
+
+/* ── Modal Backdrop ─────────────────────────────────────────── */
+.modal-backdrop {
+  background: rgba(6, 8, 13, 0.85);
+  backdrop-filter: blur(8px);
+}
+
+/* ── Recharts Overrides ─────────────────────────────────────── */
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line {
+  stroke: var(--color-aegis-border) !important;
+}
+
+.recharts-text {
+  fill: var(--color-text-muted) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 11px !important;
+}

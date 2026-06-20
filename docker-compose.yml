@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+  # ── Redis Cache ──────────────────────────────────────────────
+  aegis-cache:
+    image: redis:7-alpine
+    container_name: aegis_cache
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  # ── Local Postgres (Fallback Database) ──────────────────────
+  aegis-db:
+    image: postgres:16-alpine
+    container_name: aegis_db
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: aegis
+      POSTGRES_PASSWORD: aegis_secure_password
+      POSTGRES_DB: aegisdb
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ./gateway/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aegis -d aegisdb"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # ── AegisAPI Gateway ────────────────────────────────────────
+  aegis-gateway:
+    build: ./gateway
+    container_name: aegis_gateway
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=development
+      - PORT=5000
+      - REDIS_URL=redis://aegis-cache:6379
+      # Supabase Cloud (leave empty to use local Postgres)
+      - SUPABASE_URL=${SUPABASE_URL:-}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY:-}
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY:-}
+      # Local Postgres fallback
+      - LOCAL_PG_HOST=aegis-db
+      - LOCAL_PG_PORT=5432
+      - LOCAL_PG_USER=aegis
+      - LOCAL_PG_PASSWORD=aegis_secure_password
+      - LOCAL_PG_DATABASE=aegisdb
+      # AI Provider (NVIDIA NIM / OpenAI / Groq / etc.)
+      - AI_PROVIDER_BASE_URL=${AI_PROVIDER_BASE_URL:-}
+      - AI_PROVIDER_API_KEY=${AI_PROVIDER_API_KEY:-}
+      - AI_PROVIDER_MODEL=${AI_PROVIDER_MODEL:-meta/llama-3.1-70b-instruct}
+    depends_on:
+      aegis-cache:
+        condition: service_healthy
+      aegis-db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ── Next.js Dashboard ───────────────────────────────────────
+  aegis-dashboard:
+    build: ./dashboard
+    container_name: aegis_dashboard
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_SUPABASE_URL=${SUPABASE_URL:-}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY:-}
+      - NEXT_PUBLIC_GATEWAY_URL=http://localhost:5000
+    depends_on:
+      - aegis-gateway
+    restart: unless-stopped
+
+volumes:
+  redis_data:
+  pg_data:
