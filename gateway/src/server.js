@@ -7,6 +7,15 @@
 //   - Graceful shutdown
 // ============================================================
 
+import dotenv from 'dotenv';
+import { fileURLToPath } from 'node:url';
+import { dirname, resolve } from 'node:path';
+
+// Load .env from project root (two levels up from gateway/src/)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+dotenv.config({ path: resolve(__dirname, '../../.env') });
+
 import cluster from 'node:cluster';
 import os from 'node:os';
 import crypto from 'node:crypto';

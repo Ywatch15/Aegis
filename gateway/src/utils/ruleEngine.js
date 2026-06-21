@@ -97,7 +97,9 @@ function compileRules(rows) {
         if (!groups.has(row.category)) {
             groups.set(row.category, { patterns: [], rules: [] });
         }
-        groups.get(row.category).patterns.push(row.pattern);
+        // Strip (?i) inline flags — JS uses the 'i' flag on RegExp constructor instead
+        const cleanPattern = row.pattern.replace(/\(\?i\)/g, '');
+        groups.get(row.category).patterns.push(cleanPattern);
         groups.get(row.category).rules.push({
             id: row.id, name: row.name, severity: row.severity,
         });
